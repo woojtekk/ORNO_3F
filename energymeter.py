@@ -31,6 +31,7 @@
 # http://www.gnu.org.pl
 # ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
+import serial
 import time
 import mbusbase
 import mbusclient
@@ -43,7 +44,7 @@ energyclient = None
 def createClient(portDevice, adres):
 	tecl = mbusclient.mbclientserial()
         tecl.adres = adres
-	tecl.transportOpen(portDevice, brate=9600)
+	tecl.transportOpen(portDevice, brate=9600,parity=serial.PARITY_EVEN)
 	return tecl
 	try:
 		pass
@@ -94,7 +95,7 @@ def testPort(portDevice, adres):
 
 
 def startClient(portDevice, adres):
-	print "Energy MODBUS: " + portDevice
+	#print "Energy MODBUS: " + portDevice
 	mbcli = createClient(portDevice, adres)
 	if mbcli!=None:
 		global energyclient
