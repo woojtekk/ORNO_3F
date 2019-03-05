@@ -40,6 +40,8 @@
 # import datetime
 # DEVICE_0="/dev/ttyUSB0"
 # ADDR=1
+
+import csv
 table={
 "Serial_Number"                 :[0x00,2],
 "Modbus ID"                     :[0x02,1],
@@ -164,10 +166,20 @@ t=(
 print(len(table))
 for x in t:
     print hex(x),
+
+i=0
 for x in table:
-    print str((table[x][0])),
+    table[x][0]=t[i]
+    i+=1
+
 
 print table
+
+
+with open('mycsvfile.csv', 'wb') as f:  # Just use 'w' mode in 3.x
+    w = csv.DictWriter(f, table.keys())
+    w.writeheader()
+    w.writerow(table)
 
 
 # testEmeter=energymeter.testPort(DEVICE_0, ADDR)
