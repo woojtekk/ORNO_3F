@@ -1,0 +1,203 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+# # ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+# # Copyright (C) 2017 Piotr Murawski
+# # Niniejszy program jest wolnym oprogramowaniem; mozesz go
+# # rozprowadzac dalej i/lub modyfikowac na warunkach Powszechnej
+# # Licencji Publicznej GNU, wydanej przez Fundacje Wolnego
+# # Oprogramowania - wedlug wersji 3-ciej tej Licencji lub ktorejs
+# # z pozniejszych wersji.
+# # Niniejszy program rozpowszechniany jest z nadzieja iz bedzie on
+# # uzyteczny - jednak BEZ JAKIEJKOLWIEK GWARANCJI, nawet domyslnej
+# # gwarancji PRZYDATNOSCI HANDLOWEJ albo PRZYDATNOSCI DO OKRESLONYCH
+# # ZASTOSOWAN. W celu uzyskania blizszych informacji - Powszechna
+# # Licencja Publiczna GNU.
+# # This program is free software: you can redistribute it and/or modify
+# # it under the terms of the GNU General Public License as published by
+# # the Free Software Foundation, either version 3 of the License, or
+# # (at your option) any later version.
+# # This program is distributed in the hope that it will be useful,
+# # but WITHOUT ANY WARRANTY; without even the implied warranty of
+# # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# # GNU General Public License for more details.
+# # Z pewnoscia wraz z niniejszym programem otrzymales tez egzemplarz
+# # Powszechnej Licencji Publicznej GNU (GNU General Public License);
+# # jesli nie - napisz do Free Software Foundation, Inc., 675 Mass Ave,
+# # Cambridge, MA 02139, USA.
+# # Powszechna Licencja GNU dostepna jest rowniez na stronie:
+# # http://www.gnu.org/licenses/licenses.html
+# # nieoficjalne polskie tlumaczenie na
+# # http://www.gnu.org.pl
+# # ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#
+# import crc16
+# import sys
+# import os
+# import energymeter
+# import math
+# import struct
+# import datetime
+# DEVICE_0="/dev/ttyUSB0"
+# ADDR=1
+table={
+"Serial_Number"                 :[0x00,2],
+"Modbus ID"                     :[0x02,1],
+"Modbus Baudrate"               :[0x03,1],
+"Software Ver."                 :[0x04,2],
+"Hardware Version"              :[0x06,2],
+"SO output rate"                :[0x09,2],
+"Combined Code"                 :[0x0B,3],
+"LCD Cycle Time"                :[0x0D,1],
+"L1 Voltage"                    :[0x0E,1],
+"L2 Voltage"                    :[0x10,2],
+"L3 Voltage"                    :[0x12,2],
+"Grid Freq."                    :[0x14,2],
+"L1 Current"                    :[0x16,2],
+"L2 Current"                    :[0x18,2],
+"L3 Current"                    :[0x1A,2],
+"Total Active Power"            :[0x1C,2],
+"L1 Active Power"               :[0x1E,2],
+"L2 Active Power"               :[0x20,2],
+"L3 Active Power"               :[0x22,2],
+"Total reactive p."             :[0x24,2],
+"L1 reactive power"             :[0x26,2],
+"L2 reactive power"             :[0x28,2],
+"L3 reactive power"             :[0x2A,2],
+"Total apparent p."             :[0x2C,2],
+"L1 apparent power"             :[0x2E,2],
+"L2 apparent power"             :[0x30,2],
+"L3 apparent power"             :[0x32,2],
+"Total Power Factor"            :[0x34,2],
+"L1 power factor"               :[0x36,2],
+"L2 power factor"               :[0x38,2],
+"L3 power factor"               :[0x3A,2],
+"Date Time"                     :[0x3C,5],
+"CRC code"                      :[0x41,2],
+"Total Active Energy"           :[0x100,2],
+"L1 Active Energy"              :[0x102,2],
+"L2 Active Energy"              :[0x104,2],
+"L3 Active Energy"              :[0x106,2],
+"Total Forward Active Energy"   :[0x108,2],
+"L1 Forward Active Energy"      :[0x10A,2],
+"L2 Forward Active Energy"      :[0x10C,2],
+"L3 Forward Active Energy"      :[0x10E,2],
+"Total Reverse Energy"          :[0x110,2],
+"L1 Reverse Energy"             :[0x112,2],
+"L2 Reverse Energy"             :[0x114,2],
+"L3 Reverse Energy"             :[0x116,2],
+"Total Reactive Energy"         :[0x118,2],
+"L1 Reactive Energy"            :[0x11A,2],
+"L2 Reactive Energy"            :[0x11C,2],
+"L3 Reactive Energy"            :[0x11E,2],
+"Total Forward Reactive Energy" :[0x120,2],
+"L1 Forward Reactive Energy"    :[0x122,2],
+"L2 Forward Reactive Energy"    :[0x124,2],
+"L3 Forward Reactive Energy"    :[0x126,2],
+"Total Reverse Reactive Energy" :[0x128,2],
+"L1 Reverse Reactive Energy"    :[0x12A,2],
+"L2 Reverse Reactive Energy"    :[0x12C,2],
+"L3 Reverse Reactive Energy"    :[0x12E,2],
+"T1 Total Active Energy"              :[0x130,2],
+"T1 Total Forward Active Energy"      :[0x132,2],
+"T1 Total Reverse Active Energy"      :[0x134,2],
+"T1 Total Reactive Energy"            :[0x136,2],
+"T1 Total Forward Reactive Energy"    :[0x138,2],
+"T1 Total Reverse Reactive Energy"    :[0x13A,2],
+"T2 Total Active Energy"              :[0x13C,2],
+"T2 Total Forward Active Energy"      :[0x13E,2],
+"T2 Total Reverse Active Energy"      :[0x140,2],
+"T2 Total Reactive Energy"            :[0x142,2],
+"T2 Total Forward Reactive Energy"    :[0x144,2],
+"T2 Total Reverse Reactive Energy"    :[0x146,2],
+"T3 Total Active Energy"              :[0x148,2],
+"T3 Total Forward Active Energy"      :[0x14A,2],
+"T3 Total Reverse Active Energy"      :[0x14C,2],
+"T3 Total Reactive Energy"            :[0x14E,2],
+"T3 Total Forward Reactive Energy"    :[0x150,2],
+"T3 Total Reverse Reactive Energy"    :[0x152,2],
+"T4 Total Active Energy"              :[0x154,2],
+"T4 Total Forward Active Energy"      :[0x156,2],
+"T4 Total Reverse Active Energy"      :[0x158,2],
+"T4 Total Reactive Energy"            :[0x15A,2],
+"T4 Total Forward Reactive Energy"    :[0x15C,2],
+"T4 Total Reverse Reactive Energy"    :[0x15E,2],
+}
+
+t=(
+0x000, 0x002, 0x003, 0x004,
+0x006, 0x009, 0x00B, 0x00D,
+0x00E, 0x010, 0x012, 0x014,
+0x016, 0x018, 0x01A, 0x01C,
+0x01E, 0x020, 0x022, 0x024,
+0x026, 0x028, 0x02A, 0x02C,
+0x02E, 0x030, 0x032,
+0x034, 0x036, 0x038, 0x03A,
+0x03C, 0x041, 0x100, 0x102,
+0x104, 0x106, 0x108, 0x10A,
+0x10C, 0x10E, 0x110, 0x112,
+0x114, 0x116, 0x118, 0x11A,
+0x11C, 0x11E, 0x120, 0x122,
+0x124, 0x126, 0x128, 0x12A,
+0x12C, 0x12E, 0x130, 0x132,
+0x134, 0x136, 0x138, 0x13A,
+0x13C, 0x13E, 0x140, 0x142,
+0x144, 0x146, 0x148, 0x14A,
+0x14C, 0x14E, 0x150, 0x152,
+0x154, 0x156, 0x158, 0x15A,
+0x15C, 0x15E)
+
+#
+# def mem2float(reg1, reg2):
+#     # found on beloved "satckoverflow"
+#     raw = struct.pack('>HH', reg1, reg2)
+#     return struct.unpack('>f', raw)[0]
+#
+# def float2mem(flo):
+#     # found on beloved "satckoverflow"
+#     raw = struct.pack('>f', flo)
+#     regsy=struct.unpack('>HH', raw)
+#     return [regsy[0], regsy[1]]
+#
+
+
+print(len(table))
+for x in t:
+    print hex(x),
+for x in table:
+    print str((table[x][0])),
+
+print table
+
+
+# testEmeter=energymeter.testPort(DEVICE_0, ADDR)
+# if testEmeter:
+#    mbcli = energymeter.startClient(DEVICE_0, ADDR)
+#
+#    regs_t0=energymeter.readRegs(mbcli, 0x100,2)
+#    regs_t1=energymeter.readRegs(mbcli, 0x130,2)
+#    regs_t2=energymeter.readRegs(mbcli, 0x13C,2)
+#
+#
+#    txt =str(datetime.datetime.now())
+#    txt+=" Total: "+ str( mem2float(regs_t0[0],regs_t0[1]))
+#    txt+=" T1: "+ str( mem2float(regs_t1[0],regs_t1[1]))
+#    txt+=" T2: "+ str( mem2float(regs_t2[0],regs_t2[1]))+"\n"
+#
+#    print txt
+#
+#    with open('/home/pi/ORNO_3F/energy.log', 'a') as file:
+#       file.write(txt)
+#
+#
+#    xold=-2
+#    for x in table:
+# 	dx= x-xold
+# 	xold=x
+# 	regs=energymeter.readRegs(mbcli, x,dx)
+# 	print x, " :: ", round(mem2float(regs[0],regs[1]),3)
+#
+#
+# else:
+#
+#    print "ERROR: meter not found"
