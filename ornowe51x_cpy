@@ -42,6 +42,9 @@
 # ADDR=1
 
 import csv
+import pandas as pd
+
+
 table={
 "Serial_Number"                 :[0x00,2],
 "Modbus ID"                     :[0x02,1],
@@ -147,7 +150,7 @@ t=(
 0x144, 0x146, 0x148, 0x14A,
 0x14C, 0x14E, 0x150, 0x152,
 0x154, 0x156, 0x158, 0x15A,
-0x15C, 0x15E)
+0x15C, 0x15E, 0x160)
 
 #
 # def mem2float(reg1, reg2):
@@ -163,23 +166,84 @@ t=(
 #
 
 
-print(len(table))
-for x in t:
-    print hex(x),
-
-i=0
-for x in table:
-    table[x][0]=t[i]
-    i+=1
-
-
-print table
+def import_cvs():
+    reader = csv.reader(open("dict.csv"))
+    dic = {}
+    for row in reader:
+        a = row[1].translate(None, '[,]').split()
+        dic[row[0]] = [int(a[0]),int(a[1])]
+        print dic
+    return dic
 
 
-with open('mycsvfile.csv', 'wb') as f:  # Just use 'w' mode in 3.x
-    w = csv.DictWriter(f, table.keys())
-    w.writeheader()
-    w.writerow(table)
+def check_data_file():
+    return 0
+
+def read_channel(ch):
+    print "Czytam", ch
+
+
+def read_all_channels(channels):
+
+    for ch in channels:
+        print ch
+    return 0
+
+
+
+
+
+# for x,y in enumerate(table):
+#     table[y][0]=t[x]
+#     table[y][1]=t[x+1]-t[x]
+#
+#
+# #print table
+#
+#
+# with open('dict.csv', 'w') as csv_file:
+#     writer = csv.writer(csv_file)
+#     for key, value in table.items():
+#        writer.writerow([key, value])
+
+
+c=import_cvs()
+
+# #read_all_channels(c)
+#
+# df=pd.DataFrame.from_dict(c)
+#
+# print df
+# df.to_csv("out.txt", sep='\t')
+#
+# dd=pd.read_csv("out.txt", sep='\t')
+# print dd
+# print c
+#
+# for x in  list(dd):
+#     print x
+# #
+# print mydict
+# #
+# for x,y in enumerate(mydict):
+#    print x,mydict[y], table[y]
+#
+#
+
+
+#
+#
+# #
+# with open('mycsvfile.csv', 'wb') as f:  # Just use 'w' mode in 3.x
+#     w = csv.DictWriter(f, table.keys())
+#     w.writeheader()
+#     w.writerow(table)
+#
+# with open('mycsvfile.csv') as fh:
+#     rd = csv.DictReader(fh, delimiter=',')
+#
+# print fh
+
 
 
 # testEmeter=energymeter.testPort(DEVICE_0, ADDR)
