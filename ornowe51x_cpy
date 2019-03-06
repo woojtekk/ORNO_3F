@@ -1,46 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-# # ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-# # Copyright (C) 2017 Piotr Murawski
-# # Niniejszy program jest wolnym oprogramowaniem; mozesz go
-# # rozprowadzac dalej i/lub modyfikowac na warunkach Powszechnej
-# # Licencji Publicznej GNU, wydanej przez Fundacje Wolnego
-# # Oprogramowania - wedlug wersji 3-ciej tej Licencji lub ktorejs
-# # z pozniejszych wersji.
-# # Niniejszy program rozpowszechniany jest z nadzieja iz bedzie on
-# # uzyteczny - jednak BEZ JAKIEJKOLWIEK GWARANCJI, nawet domyslnej
-# # gwarancji PRZYDATNOSCI HANDLOWEJ albo PRZYDATNOSCI DO OKRESLONYCH
-# # ZASTOSOWAN. W celu uzyskania blizszych informacji - Powszechna
-# # Licencja Publiczna GNU.
-# # This program is free software: you can redistribute it and/or modify
-# # it under the terms of the GNU General Public License as published by
-# # the Free Software Foundation, either version 3 of the License, or
-# # (at your option) any later version.
-# # This program is distributed in the hope that it will be useful,
-# # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# # GNU General Public License for more details.
-# # Z pewnoscia wraz z niniejszym programem otrzymales tez egzemplarz
-# # Powszechnej Licencji Publicznej GNU (GNU General Public License);
-# # jesli nie - napisz do Free Software Foundation, Inc., 675 Mass Ave,
-# # Cambridge, MA 02139, USA.
-# # Powszechna Licencja GNU dostepna jest rowniez na stronie:
-# # http://www.gnu.org/licenses/licenses.html
-# # nieoficjalne polskie tlumaczenie na
-# # http://www.gnu.org.pl
-# # ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-#
-# import crc16
-# import sys
-# import os
-# import energymeter
-# import math
-# import struct
-# import datetime
-# DEVICE_0="/dev/ttyUSB0"
-# ADDR=1
-
 import csv
 import pandas as pd
 
@@ -169,10 +129,12 @@ t=(
 def import_cvs():
     reader = csv.reader(open("dict.csv"))
     dic = {}
+    to_remove=str.maketrans(dict.fromkeys('[,]'))
     for row in reader:
-        a = row[1].translate(None, '[,]').split()
+        a = row[1].translate(to_remove).split()
+        print(a)
         dic[row[0]] = [int(a[0]),int(a[1])]
-        print dic
+        print(dic)
     return dic
 
 
@@ -180,13 +142,13 @@ def check_data_file():
     return 0
 
 def read_channel(ch):
-    print "Czytam", ch
+    print("Czytam", ch)
 
 
 def read_all_channels(channels):
 
     for ch in channels:
-        print ch
+        print (ch)
     return 0
 
 
