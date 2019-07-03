@@ -166,3 +166,4 @@ class orno:
 if __name__ == "__main__":
     or3f=orno()
     or3f("asd")
+    print("koniec")
