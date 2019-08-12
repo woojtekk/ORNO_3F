@@ -44,7 +44,7 @@ energyclient = None
 def createClient(portDevice, adres):
 	tecl = mbusclient.mbclientserial()
         tecl.adres = adres
-	tecl.transportOpen(portDevice, brate=9600,parity=serial.PARITY_EVEN)
+	tecl.transportOpen(portDevice, brate=9600, parity=serial.PARITY_EVEN)
 	return tecl
 	try:
 		pass
@@ -95,7 +95,7 @@ def testPort(portDevice, adres):
 
 
 def startClient(portDevice, adres):
-	#print "Energy MODBUS: " + portDevice
+	print "Energy MODBUS: " + portDevice
 	mbcli = createClient(portDevice, adres)
 	if mbcli!=None:
 		global energyclient
@@ -103,12 +103,16 @@ def startClient(portDevice, adres):
                 return mbcli
 
 
-		
-		
-		
-		
-		
-		
-		
-		
-			
+if __name__ == "__main__":
+   mbcli = startClient("/dev/ttyUSB0", 1)
+   print
+   print "ID ORNO ... ", readRegs(mbcli, 0x0110, 1)
+   print "Grind Frequency ... ", readRegs(mbcli, 14, 1)
+   print "Voltage ... ",  readRegs(mbcli, 0x0131, 1)
+   print "Current ... ",  readRegs(mbcli, 0x0139, 1)
+   print "Active Power ... ",  readRegs(mbcli, 0x0140, 1)
+   print "Reactive Power ... ",  readRegs(mbcli, 0x0148, 1)
+   print "Apparent Power ... ",  readRegs(mbcli, 0x0150, 1)
+   print "Power Factor ... ",  readRegs(mbcli, 0x0158, 1)
+   print "Active Energy ... ",  readRegs(mbcli, 0xA000, 1)
+   print "Reactive Energy ... ",  readRegs(mbcli, 0xA01E, 1)

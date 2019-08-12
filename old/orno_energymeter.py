@@ -5,13 +5,12 @@ import os
 import csv
 import sys
 import random
-import signal
-import shutil
 
-import time
 import operator
 import pandas as pd
-import energymeter
+from old import energymeter
+
+
 class orno:
 
     table2={
@@ -101,7 +100,7 @@ class orno:
 
     def __init__(self):
         if energymeter.testPort("/dev/ttyUSB0", 1):
-            self.dev=energymeter.startClient("/dev/ttyUSB0", 1)
+            self.dev= energymeter.startClient("/dev/ttyUSB0", 1)
         else:
             print("Some problems with device.... [EXIT]")
             sys.exit()
