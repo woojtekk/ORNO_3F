@@ -166,6 +166,16 @@ class orno:
                 print(qq[x][0]," :: ",x, round(mem2float(regs[0], regs[1]), 2))
 
             
+    def mem2float(reg1, reg2):
+        # found on beloved "satckoverflow"
+        raw = struct.pack('>HH', reg1, reg2)
+        return struct.unpack('>f', raw)[0]
+
+    def float2mem(flo):
+        # found on beloved "satckoverflow"
+        raw = struct.pack('>f', flo)
+        regsy=struct.unpack('>HH', raw)
+        return [regsy[0], regsy[1]]
 
 
         
