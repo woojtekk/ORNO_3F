@@ -124,14 +124,17 @@ class orno:
             print("DATA file not exist ..... creating new: data.txt")
             oo=pd.DataFrame.from_dict(self.table2)
             oo=oo.iloc[0:0]
-            oo[self.header_order].to_csv("data.txt", sep='\t',compression="None")
+            # oo[self.header_order].to_csv("data.txt", sep='\t',compression="None")
+            oo[self.header_order].to_csv("data.txt", sep='\t')
 
     def update_data_file(self):
-        data_old = pd.read_csv('data.txt', index_col=0, sep='\t', compression="None")
+        # data_old = pd.read_csv('data.txt', index_col=0, sep='\t', compression="None")
+        data_old = pd.read_csv('data.txt', index_col=0, sep='\t')
         data_to_save = data_old.append(self.data_new, sort=True)
         data_to_save = data_to_save.reset_index(drop=True)
-        data_to_save[self.header_order].to_csv("data.txt", sep='\t', compression="None")
-        
+        # data_to_save[self.header_order].to_csv("data.txt", sep='\t', compression="None")
+        data_to_save[self.header_order].to_csv("data.txt", sep='\t')
+
     def import_config(self):
         reader = csv.reader(open("dict.csv"))
         dic = {}
