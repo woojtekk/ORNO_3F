@@ -154,7 +154,7 @@ class orno:
 
 
     def read_all_channels(self):
-        mbcli = energymeter.startClient(DEVICE_0, ADDR)
+        mbcli = energymeter.startClient("/dev/ttyUSB0", 1)
 
         self.data_new=pd.DataFrame()
 
