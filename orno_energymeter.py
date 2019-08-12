@@ -4,7 +4,7 @@ import os
 import csv
 import sys
 import random
-
+import struct
 import operator
 import pandas as pd
 import energymeter
@@ -14,14 +14,6 @@ import energymeter
 class orno:
 
     table2={
-        # "Serial_Number":            [0,   0],
-        # "Modbus ID":                [2,   2],
-        # "Modbus Baudrate":          [3,   1],
-        # "Software Ver.":            [4,   1],
-        # "Hardware Version":         [6,   2],
-        # "SO output rate":           [9,   3],
-        # "Combined Code":            [11,  2],
-        # "LCD Cycle Time":           [13,  2],
         "L1 Voltage":               [14,  1],
         "L2 Voltage":               [16,  2],
         "L3 Voltage":               [18,  2],
@@ -30,73 +22,7 @@ class orno:
         "L2 Current":               [24,  2],
         "L3 Current":               [26,  2],
         "Total Active Power":       [28,  2],
-        "L1 Active Power":          [30,  2],
-        "L2 Active Power":          [32,  2],
-        "L3 Active Power":          [34,  2],
-        "Total reactive p.":        [36,  2],
-        "L1 reactive power":        [38,  2],
-        "L2 reactive power":        [40,  2],
-        "L3 reactive power":        [42,  2],
-        "Total apparent p.":        [44,  2],
-        "L1 apparent power":        [46,  2],
-        "L2 apparent power":        [48,  2],
-        "L3 apparent power":        [50,  2],
-        "Total Power Factor":       [52,  2],
-        "L1 power factor":          [54,  2],
-        "L2 power factor":          [56,  2],
-        "L3 power factor":          [58,  2],
-        # "Date Time":                [60,  2],
-        # "CRC code":                 [65,  5],
-        # "end":                      [160, 95],
-        "Total Active Energy":      [256, 96],
-        "L1 Active Energy":         [258, 2],
-        "L2 Active Energy":         [260, 2],
-        "L3 Active Energy":         [262, 2],
-        "Total Forward Active Energy":  [264, 2],
-        "L1 Forward Active Energy": [266, 2],
-        "L2 Forward Active Energy": [268, 2],
-        "L3 Forward Active Energy": [270, 2],
-        "Total Reverse Energy":     [272, 2],
-        "L1 Reverse Energy":        [274, 2],
-        "L2 Reverse Energy":        [276, 2],
-        "L3 Reverse Energy":        [278, 2],
-        "Total Reactive Energy":    [280, 2],
-        "L1 Reactive Energy":       [282, 2],
-        "L2 Reactive Energy":       [284, 2],
-        "L3 Reactive Energy":       [286, 2],
-        "Total Forward Reactive Energy":    [288, 2],
-        "L1 Forward Reactive Energy":       [290, 2],
-        "L2 Forward Reactive Energy":       [292, 2],
-        "L3 Forward Reactive Energy":       [294, 2],
-        "Total Reverse Reactive Energy":    [296, 2],
-        "L1 Reverse Reactive Energy":       [298, 2],
-        "L2 Reverse Reactive Energy":       [300, 2],
-        "L3 Reverse Reactive Energy":       [302, 2],
-        "T1 Total Active Energy":           [304, 2],
-        "T1 Total Forward Active Energy":   [306, 2],
-        "T1 Total Reverse Active Energy":   [308, 2],
-        "T1 Total Reactive Energy":         [310, 2],
-        "T1 Total Forward Reactive Energy": [312, 2],
-        "T1 Total Reverse Reactive Energy": [314, 2],
-        "T2 Total Active Energy":           [316, 2],
-        "T2 Total Forward Active Energy " : [318, 2],
-        "T2 Total Reverse Active Energy " : [320, 2],
-        "T2 Total Reactive Energy "       : [322, 2],
-        "T2 Total Forward Reactive Energy": [324, 2],
-        "T2 Total Reverse Reactive Energy": [326, 2],
-        "T3 Total Active Energy "         : [328, 2],
-        "T3 Total Forward Active Energy " : [330, 2],
-        "T3 Total Reverse Active Energy " : [332, 2],
-        "T3 Total Reactive Energy "       : [334, 2],
-        "T3 Total Forward Reactive Energy": [336, 2],
-        "T3 Total Reverse Reactive Energy": [338, 2],
-        "T4 Total Active Energy "         : [340, 2],
-        "T4 Total Forward Active Energy " : [342, 2],
-        "T4 Total Reverse Active Energy " : [344, 2],
-        "T4 Total Reactive Energy "       : [346, 2],
-        "T4 Total Forward Reactive Energy": [348, 2],
-        "T4 Total Reverse Reactive Energy": [350, 2]
-    }
+        "Total reactive p.":        [36,  2]}
 
     def __init__(self):
         # if energymeter.testPort("/dev/ttyUSB0", 1):
@@ -114,7 +40,8 @@ class orno:
         self.read_all_channels()
         self.update_data_file()
         return 0
-    
+
+
     def check(self):
         self.header_order=[]
         for key, value in sorted(self.table2.items(), key=operator.itemgetter(1)):
@@ -162,23 +89,21 @@ class orno:
         for x in qq:
             if qq[x][1] == 2 :
                 regs = energymeter.readRegs(mbcli, qq[x][0], 2)
-                self.data_new[x] = round(mem2float(regs[0], regs[1]), 2)
-                print(qq[x][0]," :: ",x, self.data_new[x])
+                self.data_new[x] = round(self.mem2float(regs[0], regs[1]), 2)
+                print((qq[x][0],round(self.mem2float(regs[0], regs[1]), 2),x))
 
-            
-    def mem2float(reg1, reg2):
+
+    def mem2float(self,reg1, reg2):
         # found on beloved "satckoverflow"
         raw = struct.pack('>HH', reg1, reg2)
         return struct.unpack('>f', raw)[0]
 
-    def float2mem(flo):
+    def float2mem(self,flo):
         # found on beloved "satckoverflow"
         raw = struct.pack('>f', flo)
         regsy=struct.unpack('>HH', raw)
         return [regsy[0], regsy[1]]
 
-
-        
 
 
 if __name__ == "__main__":
