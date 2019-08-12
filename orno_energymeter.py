@@ -160,10 +160,10 @@ class orno:
 
         qq=pd.DataFrame.from_dict(self.table2)
         for x in qq:
-            self.data_new[x]=[round(round(random.uniform(0,0.9),4),3)]
             if qq[x][1] == 2 :
                 regs = energymeter.readRegs(mbcli, qq[x][0], 2)
-                print(qq[x][0]," :: ",x, round(mem2float(regs[0], regs[1]), 2))
+                self.data_new[x] = round(mem2float(regs[0], regs[1]), 2)
+                print(qq[x][0]," :: ",x, self.data_new[x])
 
             
     def mem2float(reg1, reg2):
