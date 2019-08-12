@@ -8,6 +8,8 @@ import random
 import operator
 import pandas as pd
 import energymeter
+import struct
+
 # from old import energymeter
 
 
@@ -163,15 +165,15 @@ class orno:
             self.data_new[x]=[round(round(random.uniform(0,0.9),4),3)]
             if qq[x][1] == 2 :
                 regs = energymeter.readRegs(mbcli, qq[x][0], 2)
-                print(qq[x][0]," :: ",x, round(mem2float(regs[0], regs[1]), 2))
+                print(qq[x][0] +" :: "+round(self.mem2float(regs[0], regs[1]), 2)+" \t"+x)
 
             
-    def mem2float(reg1, reg2):
+    def mem2float(self,reg1, reg2):
         # found on beloved "satckoverflow"
         raw = struct.pack('>HH', reg1, reg2)
         return struct.unpack('>f', raw)[0]
 
-    def float2mem(flo):
+    def float2mem(self,flo):
         # found on beloved "satckoverflow"
         raw = struct.pack('>f', flo)
         regsy=struct.unpack('>HH', raw)
