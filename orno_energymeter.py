@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.5
+#!/usr/bin/env python
 # encoding: utf-8
 import os
 import csv
@@ -8,21 +8,28 @@ import struct
 import operator
 import pandas as pd
 import energymeter
+import datetime
 # from old import energymeter
 
 
 class orno:
 
     table2={
-        "L1 Voltage":               [14,  1],
-        "L2 Voltage":               [16,  2],
-        "L3 Voltage":               [18,  2],
-        "Grid Freq.":               [20,  2],
-        "L1 Current":               [22,  2],
-        "L2 Current":               [24,  2],
-        "L3 Current":               [26,  2],
-        "Total Active Power":       [28,  2],
-        "Total reactive p.":        [36,  2]}
+        "DateTime":                    [0,     0],
+        "Grid Freq.":                  [0x3c,  2],
+        "Grid Freq.":                  [0x14,  2],
+        "Current L1":                  [0x16,  2],
+        "Current L2":                  [0x18,  2],
+        "Current L3":                  [0x1A,  2],
+        "Active Power Total:":         [0x1C,  2],
+        "Active Power L1:":            [0x1E,  2],
+        "Active Power L2:":            [0x20,  2],
+        "Active Power L3:":            [0x22,  2],
+        "Total Active Energy TT":      [0x100,  2],
+        "Total Active Energy T1":      [0x130,  2],
+        "Total Active Energy T2":      [0x13C,  2],
+        "Total Active Energy T3":      [0x148,  2],
+        "Total reactive p.":           [36,  2]}
 
     def __init__(self):
         # if energymeter.testPort("/dev/ttyUSB0", 1):
@@ -31,6 +38,7 @@ class orno:
         #     print("Some problems with device.... [EXIT]")
         #     sys.exit()
         #
+        self.data_new=pd.DataFrame()
         
         self.check()
         self.read_all_channels()
@@ -47,20 +55,20 @@ class orno:
         for key, value in sorted(self.table2.items(), key=operator.itemgetter(1)):
              self.header_order.append(key)
 
-        if not os.path.isfile("data.txt"):
+        if not os.path.isfile("/home/pi/ORNO_3F/data.txt"):
             print("DATA file not exist ..... creating new: data.txt")
             oo=pd.DataFrame.from_dict(self.table2)
             oo=oo.iloc[0:0]
-            # oo[self.header_order].to_csv("data.txt", sep='\t',compression="None")
-            oo[self.header_order].to_csv("data.txt", sep='\t')
+            #oo[self.header_order].to_csv("data.txt", sep='\t',compression="gzip")
+            oo[self.header_order].to_csv("/home/pi/ORNO_3F/data.txt", sep='\t')
 
     def update_data_file(self):
-        # data_old = pd.read_csv('data.txt', index_col=0, sep='\t', compression="None")
-        data_old = pd.read_csv('data.txt', index_col=0, sep='\t')
+        #data_old = pd.read_csv('data.txt', index_col=0, sep='\t', compression="gzip")
+        data_old = pd.read_csv('/home/pi/ORNO_3F/data.txt', index_col=0, sep='\t')
         data_to_save = data_old.append(self.data_new, sort=True)
         data_to_save = data_to_save.reset_index(drop=True)
-        # data_to_save[self.header_order].to_csv("data.txt", sep='\t', compression="None")
-        data_to_save[self.header_order].to_csv("data.txt", sep='\t')
+        #data_to_save[self.header_order].to_csv("data.txt", sep='\t', compression="gzip")
+        data_to_save[self.header_order].to_csv("/home/pi/ORNO_3F/data.txt", sep='\t')
 
     def import_config(self):
         reader = csv.reader(open("dict.csv"))
@@ -82,15 +90,18 @@ class orno:
 
     def read_all_channels(self):
         mbcli = energymeter.startClient("/dev/ttyUSB0", 1)
-
-        self.data_new=pd.DataFrame()
+        now = datetime.datetime.now()
 
         qq=pd.DataFrame.from_dict(self.table2)
         for x in qq:
+            if x == "DateTime":
+                self.data_new[x] = now.strftime("%Y-%m-%d %H:%M")
             if qq[x][1] == 2 :
                 regs = energymeter.readRegs(mbcli, qq[x][0], 2)
-                self.data_new[x] = round(self.mem2float(regs[0], regs[1]), 2)
-                print((qq[x][0],round(self.mem2float(regs[0], regs[1]), 2),x))
+                self.data_new[x] = [round(self.mem2float(regs[0], regs[1]), 3)]
+		txt=str(x)+"    \t  "+str(round(self.mem2float(regs[0], regs[1]),3))
+		print(txt)
+
 
 
     def mem2float(self,reg1, reg2):
@@ -108,5 +119,4 @@ class orno:
 
 if __name__ == "__main__":
     or3f=orno()
-    or3f("asd")
     print("koniec")
