@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
-
+#---------------------------------
 # ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 # Copyright (C) 2017 Piotr Murawski
 # Niniejszy program jest wolnym oprogramowaniem; mozesz go
